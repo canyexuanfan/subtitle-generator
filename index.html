@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="上传图片，直接在浏览器里添加多行字幕并导出图片。">
+    <title>图片字幕生成器</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>图片字幕生成器</h1>
+        </header>
+        
+        <main class="main-content">
+            <!-- 左侧控制面板 -->
+            <div class="control-panel">
+                <!-- 图片上传区域 -->
+                <section class="upload-section">
+                    <h2>上传图片</h2>
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-placeholder">
+                            <button class="upload-btn" id="uploadBtn" type="button">+ 选择图片</button>
+                            <p class="upload-hint">支持 JPEG、PNG、GIF、WebP 格式，最大 10MB</p>
+                        </div>
+                        <div class="file-info" id="fileInfo" style="display: none;">
+                            <span class="file-name" id="fileName"></span>
+                            <button class="remove-btn" id="removeBtn" type="button" aria-label="移除当前图片">×</button>
+                        </div>
+                    </div>
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                </section>
+
+                <!-- 字幕设置区域 -->
+                <section class="settings-section">
+                    <h2>字幕设置</h2>
+                    
+                    <div class="setting-row">
+                        <div class="setting-item">
+                            <label for="subtitleHeight">字幕高度</label>
+                            <div class="input-group">
+                                <input type="number" id="subtitleHeight" value="80" min="10" max="200">
+                                <span class="unit">px</span>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <label for="fontSize">字体大小</label>
+                            <div class="input-group">
+                                <input type="number" id="fontSize" value="40" min="12" max="100">
+                                <span class="unit">px</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-item">
+                            <label for="textColor">字体颜色</label>
+                            <div class="color-input-group">
+                                <input type="color" id="textColor" value="#FFFFFF">
+                                <input type="text" id="textColorHex" value="#FFFFFF" maxlength="7">
+                            </div>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <label for="bgColor">背景颜色</label>
+                            <div class="color-input-group">
+                                <input type="color" id="bgColor" value="#000000">
+                                <input type="text" id="bgColorHex" value="#000000" maxlength="7">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-item">
+                            <label for="fontFamily">字体样式</label>
+                            <select id="fontFamily">
+                                <option value="Microsoft YaHei">微软雅黑</option>
+                                <option value="SimSun">宋体</option>
+                                <option value="Arial">Arial</option>
+                                <option value="KaiTi">楷体</option>
+                                <option value="LiSu">隶书</option>
+                            </select>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <label for="fontWeight">字体粗细</label>
+                            <select id="fontWeight">
+                                <option value="normal">正常</option>
+                                <option value="bold">粗体</option>
+                                <option value="lighter">细体</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="setting-item">
+                            <label for="textAlign">文字对齐</label>
+                            <select id="textAlign">
+                                <option value="left">左对齐</option>
+                                <option value="center">居中</option>
+                                <option value="right">右对齐</option>
+                            </select>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <label for="lineHeight">行间距</label>
+                            <div class="input-group">
+                                <input type="number" id="lineHeight" value="1.2" min="1" max="3" step="0.1">
+                                <span class="unit">倍</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item full-width">
+                        <label for="bgOpacity">背景透明度</label>
+                        <input type="range" id="bgOpacity" min="0" max="1" step="0.1" value="0.8">
+                        <span class="opacity-value" id="opacityValue">0.8</span>
+                    </div>
+                </section>
+
+                <!-- 字幕内容编辑区域 -->
+                <section class="content-section">
+                    <h2>字幕内容</h2>
+                    <textarea id="subtitleText" placeholder="请输入字幕内容，支持多行文本...\n\n示例：\n这是Manus的拍照片\n也是一个历史性的时刻\nManus不一定会笑到最后\n但世界已经因此开始发生一些变化">这是Manus的拍照片
+也是一个历史性的时刻
+Manus不一定会笑到最后
+但世界已经因此开始发生一些变化</textarea>
+                    <div class="char-count">
+                        <span id="charCount">0</span> 字符
+                    </div>
+                </section>
+
+                <!-- 操作按钮区域 -->
+                <section class="action-section">
+                    <button class="btn btn-primary" id="generateBtn" type="button" disabled>生成字幕图片</button>
+                    <button class="btn btn-secondary" id="saveBtn" type="button" disabled>保存图片</button>
+                    <div class="quality-options">
+                        <label>图片质量：</label>
+                        <select id="imageQuality">
+                            <option value="1">高质量</option>
+                            <option value="0.8" selected>中等质量</option>
+                            <option value="0.6">低质量</option>
+                        </select>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 右侧预览面板 -->
+            <div class="preview-panel">
+                <h2>预览</h2>
+                <div class="preview-container">
+                    <div class="preview-placeholder" id="previewPlaceholder">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21,15 16,10 5,21"></polyline>
+                        </svg>
+                        <p>请先上传图片</p>
+                    </div>
+                    <canvas id="previewCanvas" style="display: none;"></canvas>
+                </div>
+                <div class="preview-controls">
+                    <button class="btn btn-small" id="zoomInBtn" type="button">放大</button>
+                    <button class="btn btn-small" id="zoomOutBtn" type="button">缩小</button>
+                    <button class="btn btn-small" id="resetZoomBtn" type="button">重置</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

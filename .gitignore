@@ -1,0 +1,11 @@
+# Generated images from local testing
+subtitle-image-*
+
+# Local editor and OS files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Vercel local project metadata
+.vercel/
