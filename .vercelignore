@@ -1,0 +1,7 @@
+# Keep production deployment as a tiny static site.
+server.py
+*.md
+nginx-config-*.conf
+subtitle-image-*
+.git
+.gitignore
